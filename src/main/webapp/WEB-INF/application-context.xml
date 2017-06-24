@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://www.springframework.org/schema/context 
+  http://www.springframework.org/schema/context/spring-context.xsd
+  http://www.springframework.org/schema/tx
+  http://www.springframework.org/schema/tx/spring-tx.xsd
+  http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+
+	<context:annotation-config></context:annotation-config>
+	<context:component-scan
+		base-package="nextbike.modules" />
+	<tx:annotation-driven transaction-manager="txManager" />
+	<bean id="applicationProperties"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="location">
+			<value>classpath:config.properties</value>
+		</property>
+		<property name="fileEncoding">
+			<value>UTF-8</value>
+		</property>
+	</bean>
+ 
+	<bean
+		class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
+	
+	
+	
+	
+	<bean id="auctionSystemDataSourceGlobal" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close" scope="singleton">
+		<property name="driverClass"
+			value="${auction.system.db.driver}" />
+		<property name="jdbcUrl"
+			value="${auction.system.db.jdbcUrl}" />
+		<property name="user"
+			value="${auction.system.db.user}" />
+		<property name="password"
+			value="${auction.system.db.pass}" />
+
+		<!-- these are C3P0 properties -->
+		<property name="acquireIncrement" value="15" />
+		<property name="minPoolSize" value="50" />
+		<property name="maxPoolSize" value="300" />
+		<!-- in seconds -->
+		<property name="maxIdleTime" value="1800" />
+		<!-- in miliseconds -->
+		<property name="checkoutTimeout" value="5000" />
+		<!-- in seconds -->
+		<property name="idleConnectionTestPeriod" value="30" />
+		<property name="debugUnreturnedConnectionStackTraces" value="true" />
+		<property name="preferredTestQuery" value="SELECT 1" />
+		<property name="testConnectionOnCheckin" value="true" />
+		<property name="testConnectionOnCheckout" value="true" />
+		<property name="maxStatements" value="0" />
+		<property name="maxStatementsPerConnection" value="0" />
+		<property name="numHelperThreads" value="15" />
+		<property name="acquireRetryAttempts" value="15" />
+		<!-- in miliseconds -->
+		<property name="acquireRetryDelay" value="500" />
+		<property name="breakAfterAcquireFailure" value="false" />
+	</bean>
+
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="auctionSystemDataSourceGlobal" />
+	</bean>
+	
+	
+</beans>
