@@ -20,20 +20,34 @@
 	<%@include file="navbar.jsp"%>
 	<div class="row">
 		<center>
-			Średni czas przejazdu: ${time }
+			Średni czas przejazdu: ${time } </br>
+			Punkty pośrednie:</br> 
+			<i>(Ctrl+Click or Cmd+Click wybieranie wielu punktów)</i> </br> 
+			<select multiple
+				id="waypoints">
+				<c:forEach var="item" items="${stations3}">
+					<option value="${item.nazwaStacji}">${item.nazwaStacji}</option>
+				</c:forEach>
+			</select>
+			 <input type="submit" id="submit">
 			<div id="map"></div>
 		</center>
 	</div>
 </body>
 <script>
+	var waypts = [];
+	var s = ${stacje}
+	console.log(s.stacje[1].lat_var)
 	var locationA;
 	var locationB;
 	locationA = {
 		lat : ${pointA.lat},
-		lng : ${pointA.lng}};
+		lng : ${pointA.lng}
+		};
 	locationB = {
 		lat : ${pointB.lat},
-		lng : ${pointB.lng}}; 
+		lng : ${pointB.lng}
+		}; 
 	function initMap() {
 		var directionsDisplay = new google.maps.DirectionsRenderer;
 		var directionsService = new google.maps.DirectionsService;
@@ -46,18 +60,61 @@
 		});
 		directionsDisplay.setMap(map);
 		calculateAndDisplayRoute(directionsService, directionsDisplay);
+		document.getElementById('submit').addEventListener('click', function() {
+	          myFunction(directionsService, directionsDisplay);
+	        });
 	}
-	function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+	 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
 		directionsService.route({
 			origin : locationA,
 			destination : locationB,
-			travelMode : google.maps.TravelMode.BICYCLING
+			travelMode : google.maps.TravelMode.DRIVING
+		}, function(response, status) {
+			if (status == google.maps.DirectionsStatus.OK) {
+				directionsDisplay.setDirections(response);
+			}
+		});
+	} 
+	function myFunction(directionsService, directionsDisplay) {
+		waypts = [];
+        var loc;
+        var checkboxArray = document.getElementById('waypoints');
+        for (var i = 0; i < checkboxArray.length; i++) {
+          if (checkboxArray.options[i].selected) 
+          {
+           		for(z=0; z<s.stacje.length;z++)		
+        	  	{
+           			if(checkboxArray.options[i].value == s.stacje[z].nazwaStacji)
+           				{
+           					
+           					loc = {
+           						lat : s.stacje[z].lat_var,
+           						lng : s.stacje[z].lng_var
+           						};
+	           				waypts.push({
+	           	              location: loc,
+	           	              stopover: true
+	           	            });
+        	  			}
+        	  	}	
+        	  
+          }
+        }
+        
+        directionsService.route({
+			origin : locationA,
+			destination : locationB,
+			waypoints: waypts,
+	        optimizeWaypoints: true,
+			travelMode : google.maps.TravelMode.DRIVING
 		}, function(response, status) {
 			if (status == google.maps.DirectionsStatus.OK) {
 				directionsDisplay.setDirections(response);
 			}
 		});
 	}
+
+	
 </script>
 <script
 	src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
