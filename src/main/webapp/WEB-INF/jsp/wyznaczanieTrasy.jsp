@@ -28,7 +28,7 @@
 			action="/nextbike/webapp/wyznaczanieTrasy" role="form">
 		
 			<div class="row col-lg-3">
-				<label>Point A</label>
+				<label>Punkt A</label>
 				<form:select id="pointA" path="pointA" items="${stationsNames }" class="form-control" />
 				<div>
 					<form:errors path="pointA" element="div" />
