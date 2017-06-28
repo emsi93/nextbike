@@ -20,9 +20,9 @@
 	<%@include file="navbar.jsp"%>
 	<div class="row">
 		<center>
-			Średni czas przejazdu: ${time } </br>
+			Średni czas przejazdu: ${time } min </br>
 			Punkty pośrednie:</br> 
-			<i>(Ctrl+Click or Cmd+Click wybieranie wielu punktów)</i> </br> 
+			<i>(Ctrl+Click lub Cmd+Click wybieranie wielu punktów)</i> </br> 
 			<select multiple
 				id="waypoints">
 				<c:forEach var="item" items="${stations3}">
@@ -68,7 +68,7 @@
 		directionsService.route({
 			origin : locationA,
 			destination : locationB,
-			travelMode : google.maps.TravelMode.DRIVING
+			travelMode : google.maps.TravelMode.BICYCLING
 		}, function(response, status) {
 			if (status == google.maps.DirectionsStatus.OK) {
 				directionsDisplay.setDirections(response);
@@ -106,7 +106,7 @@
 			destination : locationB,
 			waypoints: waypts,
 	        optimizeWaypoints: true,
-			travelMode : google.maps.TravelMode.DRIVING
+			travelMode : google.maps.TravelMode.WALKING
 		}, function(response, status) {
 			if (status == google.maps.DirectionsStatus.OK) {
 				directionsDisplay.setDirections(response);
