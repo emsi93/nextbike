@@ -18,28 +18,45 @@
 </head>
 <body>
 	<%@include file="navbar.jsp"%>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8"><center>
+			<div id="map"></div>
+		</center></div>
+			<div class="col-md-4">
+				Średni czas przejazdu: ${time } min</br> <i>(Ctrl+Click
+				lub Cmd+Click wybieranie wielu punktów)</i> </br>
+			<div class="form-group">
+			 Punkty pośrednie:
+				<select size="10" multiple id="waypoints">
+					<c:forEach var="item" items="${stations3}">
+						<option value="${item.nazwaStacji}">${item.nazwaStacji}</option>
+					</c:forEach>
+				</select></br><input type="submit" class="btn btn-primary" id="submit">
+				
+			</div>
+			<div id="content">
+					
+					
+				</div>
+			</div>
+		</div>
+	</div>
 	<div class="row">
 		<center>
-			Średni czas przejazdu: ${time } min </br>
-			Punkty pośrednie:</br> 
-			<i>(Ctrl+Click lub Cmd+Click wybieranie wielu punktów)</i> </br> 
-			<select multiple
-				id="waypoints">
-				<c:forEach var="item" items="${stations3}">
-					<option value="${item.nazwaStacji}">${item.nazwaStacji}</option>
-				</c:forEach>
-			</select>
-			 <input type="submit" id="submit">
 			<div id="map"></div>
 		</center>
 	</div>
+	
 </body>
 <script>
+
 	var waypts = [];
-	var s = ${stacje}
-	console.log(s.stacje[1].lat_var)
+	var stacjeWybrane = [];
+	var s = ${stacje};
 	var locationA;
 	var locationB;
+	var content =  document.getElementById("content");
 	locationA = {
 		lat : ${pointA.lat},
 		lng : ${pointA.lng}
@@ -62,6 +79,10 @@
 		calculateAndDisplayRoute(directionsService, directionsDisplay);
 		document.getElementById('submit').addEventListener('click', function() {
 	          myFunction(directionsService, directionsDisplay);
+	          content.innerHTML="Czas między punktami:<br>";
+	          myFunction2();
+	          
+	          
 	        });
 	}
 	 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
@@ -77,6 +98,7 @@
 	} 
 	function myFunction(directionsService, directionsDisplay) {
 		waypts = [];
+		stacjeWybrane = [];
         var loc;
         var checkboxArray = document.getElementById('waypoints');
         for (var i = 0; i < checkboxArray.length; i++) {
@@ -91,6 +113,12 @@
            						lat : s.stacje[z].lat_var,
            						lng : s.stacje[z].lng_var
            						};
+           					stacjeWybrane.push({
+           						lat : s.stacje[z].lat_var,
+           						lng : s.stacje[z].lng_var,
+           						idstacji:s.stacje[z].idStacji,
+           						nazwaStacji: s.stacje[z].nazwaStacji
+           						});
 	           				waypts.push({
 	           	              location: loc,
 	           	              stopover: true
@@ -100,18 +128,77 @@
         	  
           }
         }
-        
         directionsService.route({
 			origin : locationA,
 			destination : locationB,
 			waypoints: waypts,
-	        optimizeWaypoints: true,
-			travelMode : google.maps.TravelMode.WALKING
+			travelMode : google.maps.TravelMode.BICYCLING
 		}, function(response, status) {
 			if (status == google.maps.DirectionsStatus.OK) {
 				directionsDisplay.setDirections(response);
 			}
 		});
+	};
+	function myFunction2(){
+		var lat = ${pointA.lat};
+		var lng = ${pointA.lng};
+		var wynik = [];
+		var czasy = [];
+		var times = ${times};
+		var wynik2 = [];
+		for(k=0;k<stacjeWybrane.length;k=k+1)
+			{
+				var odlegloscX = Math.abs(lat - stacjeWybrane[k].lat);
+				var odlegloscY = Math.abs(lng - stacjeWybrane[k].lng);
+				var odleglosc = Math.sqrt( odlegloscX*odlegloscX +odlegloscY*odlegloscY );
+				wynik.push({
+					dystans : odleglosc,
+					idStacji : stacjeWybrane[k].idstacji,
+					nazwaStacji: stacjeWybrane[k].nazwaStacji
+				});
+			}
+		wynik.sort(function(a, b){
+		    return a.dystans - b.dystans;
+		});
+		czasy = [];
+		wynik2 = [];
+		var id = ${pointA.idstacji};
+		wynik2.push({
+			idstacji: id,
+		});
+		for(k=0;k<wynik.length;k=k+1)
+		{	
+			wynik2.push({
+				idstacji:wynik[k].idStacji
+			});	
+		}
+		id = ${pointB.idstacji};
+		wynik2.push({
+			idstacji: id,
+		});
+		for(k=0; k<wynik2.length-1;k=k+1)
+			{
+				for(z=0;z<times.czasy.length;z=z+1)
+				{
+					if(times.czasy[z].idstacjiod == wynik2[k].idstacji )
+						{
+							if(times.czasy[z].idstacjido == wynik2[k+1].idstacji)
+								{
+									czasy.push(times.czasy[z].czas);
+									break;
+								}else
+									continue;
+						}else
+							continue;
+				}
+			}
+		var tresc = "";
+		for(i=0;i<czasy.length;i++)
+			{
+				tresc = tresc + " " + czasy[i] + "<br>";
+				
+			}
+		content.innerHTML=tresc;
 	}
 
 	
@@ -126,7 +213,7 @@
 </script>
 <style>
 #map {
-	height: 650px;
+	height: 430px;
 	width: 100%;
 }
 </style>
