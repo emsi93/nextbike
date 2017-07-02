@@ -9,7 +9,7 @@
 <html>
 
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Nextbike - statystyki</title>
 <link href="/nextbike/static/bootstrap/css/bootstrap.min.css"
 	rel="stylesheet">

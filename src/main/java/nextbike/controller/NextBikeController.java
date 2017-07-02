@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -36,8 +37,8 @@ public class NextBikeController {
 
 	private static String URL_GETSTATION = "https://sheltered-lowlands-77048.herokuapp.com/getStations";
 	private static String URL_ROAD_TIME = "https://sheltered-lowlands-77048.herokuapp.com/getRoadTime";
-	private static String MESSAGE_ERROR = "èle wype≥ni≥eú formularz";
-	private static String MESSAGE = "Poprawnie poda≥eú punkty trasy";
+	private static String MESSAGE_ERROR = "≈πle wype≈Çni≈Çe≈õ formularz";
+	private static String MESSAGE = "Poprawnie poda≈Çe≈õ punkty trasy";
 	
 	private static Logger logger = LogManager.getLogger(NextBikeController.class);
 
@@ -73,6 +74,7 @@ public class NextBikeController {
 		stationsNames.add("");
 		for (int i = 0; i < stations.size(); i++)
 			stationsNames.add(stations.get(i).getNazwaStacji());
+		Collections.sort(stationsNames);
 		modelAndView.addObject("stationsNames", stationsNames);
 
 		if (roadStationOrNull == null) {
@@ -113,16 +115,17 @@ public class NextBikeController {
 		Point pointB = null;
 		for (int i = 0; i < stations.size(); i++) {
 			if (stations.get(i).getNazwaStacji().equals(roadStation.getPointA())) {
-				pointA = new Point(stations.get(i).getLat(), stations.get(i).getLng(), stations.get(i).getIdStacji());
+				pointA = new Point(stations.get(i).getLat(), stations.get(i).getLng(), stations.get(i).getIdStacji(), stations.get(i).getNazwaStacji());
 			}
 			if (stations.get(i).getNazwaStacji().equals(roadStation.getPointB())) {
-				pointB = new Point(stations.get(i).getLat(), stations.get(i).getLng(), stations.get(i).getIdStacji());
+				pointB = new Point(stations.get(i).getLat(), stations.get(i).getLng(), stations.get(i).getIdStacji(), stations.get(i).getNazwaStacji());
 			}
 		}
 		modelAndView.addObject("pointA", pointA);
 		modelAndView.addObject("pointB", pointB);
 		JSONObject czasy = getJSONObjectFromAPI(URL_ROAD_TIME, "czasy");
 		List<Times> times = getTimes(czasy);
+		modelAndView.addObject("times", czasy);
 		int time = 0;
 		for (int i = 0; i < times.size(); i++) {
 			if (times.get(i).getStationFrom() == pointA.getIdstacji()
@@ -153,7 +156,8 @@ public class NextBikeController {
 		in.close();
 		String string = response.toString();
 		byte[] bytes = string.getBytes();
-		String string2 = new String(bytes, "UTF-8");
+		String string2 = new String(bytes,"UTF-8");
+		string2 = string2.replace("ÔøΩ?","≈Å");
 		JSONArray array = new JSONArray(string2);
 		JSONObject json = new JSONObject();
 		json.put(nameArray, array);
@@ -225,6 +229,7 @@ public class NextBikeController {
 			object.put("nazwaStacji", wayPoints.get(i).getNazwaStacji());
 			object.put("lat_var", wayPoints.get(i).getLat());
 			object.put("lng_var", wayPoints.get(i).getLng());
+			object.put("idStacji", wayPoints.get(i).getIdStacji());
 			jsonArray.put(object);
 
 		}

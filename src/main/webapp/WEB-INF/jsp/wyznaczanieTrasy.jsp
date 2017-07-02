@@ -18,42 +18,47 @@
 </head>
 <body>
 	<%@include file="navbar.jsp"%>
-	<div class="panel-body">
-		<c:if test="${not empty wiadomosc}">
-			<div class="alert alert-info">
-				<center>${wiadomosc}</center>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8">
+				<div id="map"></div>
 			</div>
-		</c:if>
-		<form:form method="post" modelAttribute="roadForm"
-			action="/nextbike/webapp/wyznaczanieTrasy" role="form">
-		
-			<div class="row col-lg-3">
-				<label>Punkt A</label>
-				<form:select id="pointA" path="pointA" items="${stationsNames }" class="form-control" />
-				<div>
-					<form:errors path="pointA" element="div" />
-				</div>
-			</div>
-			
-			<div class="row col-lg-3">
-			<label>Punkt B</label>
-				<form:select id="pointB" path="pointB" items="${stationsNames }" class="form-control" />
-				<div>
-					<form:errors path="pointB" element="div" />
-				</div>
-			</div>
-			<div class="row col-lg-3"><br>
-			<form:input class="submit btn btn-primary" path="" type="submit"
-				value="Wyznacz trasę"></form:input>
-				</div>
-		</form:form>
-	</div>
-	<div class="row">
-		<center>
-			<div id="map"></div>
-		</center>
-	</div>
+			<div class="col-md-4">
+				<c:if test="${not empty wiadomosc}">
+					<div class="alert alert-info">
+						<center>${wiadomosc}</center>
+					</div>
+				</c:if>
+				<form:form method="post" modelAttribute="roadForm"
+					action="/nextbike/webapp/wyznaczanieTrasy" role="form">
+					<div class="form-group">
+						Z:
+						<form:select id="pointA" path="pointA" items="${stationsNames }"
+							class="form-control" />
+						<div>
+							<form:errors path="pointA" element="div" />
+						</div>
 
+					</div>
+					<div class="form-group">
+
+						Do:
+						<form:select id="pointB" path="pointB" items="${stationsNames }"
+							class="form-control" />
+						<div>
+							<form:errors path="pointB" element="div" />
+						</div>
+
+					</div>
+					<div class="row col-lg-3">
+						<br>
+						<form:input class="submit btn btn-primary" path="" type="submit"
+							value="Wyznacz trasę"></form:input>
+					</div>
+				</form:form>
+			</div>
+		</div>
+	</div>
 </body>
 <script>
 	var s = ${stacje};
@@ -101,7 +106,7 @@
 </script>
 <style>
 #map {
-	height: 650px;
+	height: 430px;
 	width: 100%;
 }
 </style>
